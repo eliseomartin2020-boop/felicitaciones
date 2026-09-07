@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#0f2440">
+<title>Torneo Mabel 44</title>
+<!-- PREVISUALIZACIÓN WHATSAPP: cambia https://eliseomartin2020-boop.github.io/felicitaciones por la URL final de GitHub Pages, con barra al final -->
+<meta property="og:title" content="Torneo Mabel 44">
+<meta property="og:description" content="Al mejor de tres sets. Toca para saltar a la pista.">
+<meta property="og:image" content="https://eliseomartin2020-boop.github.io/felicitaciones/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://eliseomartin2020-boop.github.io/felicitaciones/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  :root{--navy:#0f2440;--court:#1f63b5;--court-dark:#164b8c;--line:#fff;--ball:#dce84a;--sand:#f6efe2;--ink:#0b1a2e}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%;background:var(--navy);color:var(--sand);font-family:"Helvetica Neue",Arial,Roboto,system-ui,sans-serif;overflow-x:hidden}
+  body{min-height:100dvh;position:relative}
+  .court{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}.court svg{width:100%;height:100%}
+  .screen{position:relative;z-index:1;min-height:100dvh;display:none;flex-direction:column;padding:20px 18px 32px;max-width:520px;margin:0 auto}
+  .screen.active{display:flex}
+  .board{display:grid;grid-template-columns:1fr auto auto auto;gap:6px 10px;align-items:center;background:var(--ink);border:2px solid var(--line);border-radius:10px;padding:10px 14px;font-weight:800}
+  .board .name{font-size:15px}
+  .board .cell{width:32px;height:32px;border-radius:6px;background:#1d3557;display:grid;place-items:center;font-size:17px;color:#9db3cc}
+  .board .cell.won{background:var(--ball);color:var(--ink)}.board .cell.live{outline:2px solid var(--ball);color:var(--sand)}
+  .board .hdr{font-size:11px;color:#9db3cc;text-align:center;font-weight:600}
+  h1{font-size:clamp(52px,17vw,88px);line-height:.9;margin:0;font-weight:900;letter-spacing:-.04em}
+  h1 small{display:block;font-size:.34em;letter-spacing:-.01em;font-weight:700;color:var(--ball);margin-bottom:8px}
+  h2{font-size:30px;line-height:1.05;margin:0 0 8px;font-weight:900;letter-spacing:-.03em}
+  p{font-size:17px;line-height:1.45;margin:0 0 14px}.muted{color:#b9c8dc}
+  .btn{appearance:none;border:0;border-radius:999px;background:var(--ball);color:var(--ink);font:inherit;font-weight:800;font-size:18px;padding:16px 26px;width:100%;cursor:pointer;box-shadow:0 6px 0 #9aa32a;transition:transform .08s}
+  .btn:active{transform:translateY(4px);box-shadow:0 2px 0 #9aa32a}
+  .btn:focus-visible{outline:3px solid #fff;outline-offset:3px}.btn[disabled]{opacity:.35;pointer-events:none}
+  .fill{flex:1}
+  .ball{width:64px;height:64px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#f3fb8c,var(--ball) 55%,#b8c13a);position:relative;box-shadow:0 8px 20px rgba(0,0,0,.35)}
+  .ball::after{content:"";position:absolute;inset:6px;border-radius:50%;border:3px solid rgba(255,255,255,.7);border-left-color:transparent;border-right-color:transparent;transform:rotate(25deg)}
+  .bounce{animation:bounce 1.4s cubic-bezier(.3,0,.2,1) infinite}
+  @keyframes bounce{0%,100%{transform:translateY(0)}45%,50%{transform:translateY(-26px)}95%{transform:translateY(0) scale(1.08,.9)}}
+  @media (prefers-reduced-motion:reduce){.bounce{animation:none}}
+  .q{font-size:22px;font-weight:800;line-height:1.2;margin:0 0 14px;letter-spacing:-.02em}
+  .opt{display:block;width:100%;text-align:left;border:2px solid var(--line);background:rgba(255,255,255,.06);color:var(--sand);font:inherit;font-size:17px;font-weight:600;padding:14px 16px;border-radius:12px;margin-bottom:10px;cursor:pointer}
+  .opt.ok{background:var(--ball);color:var(--ink);border-color:var(--ball)}.opt.bad{opacity:.45;text-decoration:line-through}
+  .feedback{min-height:26px;font-weight:700;color:var(--ball);margin-bottom:8px}
+  .video-wrap{border-radius:14px;overflow:hidden;background:#000;border:2px solid var(--line);margin-bottom:12px}
+  video{display:block;width:100%;max-height:68dvh;background:#000}
+  .scratch{position:relative;width:100%;aspect-ratio:4/3;border-radius:14px;overflow:hidden;border:2px solid var(--line);background:var(--court-dark)}
+  .scratch .under{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:22px;font-size:19px;line-height:1.45;font-weight:600}
+  .scratch canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+  .ticket{background:var(--sand);color:var(--ink);border-radius:16px;overflow:hidden;position:relative;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+  .ticket .top{background:var(--court);color:#fff;padding:18px 20px 16px}
+  .ticket .top .ev{font-size:13px;font-weight:700;opacity:.9;margin-bottom:6px}.ticket .top .tt{font-size:30px;font-weight:900;line-height:1;letter-spacing:-.03em}
+  .ticket .tear{border-top:2px dashed #c9c0ad;position:relative;margin:0 12px}
+  .ticket .tear::before,.ticket .tear::after{content:"";position:absolute;top:-12px;width:24px;height:24px;border-radius:50%;background:var(--navy)}
+  .ticket .tear::before{left:-24px}.ticket .tear::after{right:-24px}
+  .ticket .body{padding:18px 20px 20px;display:grid;grid-template-columns:1fr 1fr;gap:12px 10px}
+  .ticket .k{font-size:11px;color:#6b6252;font-weight:700}.ticket .v{font-size:17px;font-weight:800}
+  .ticket .wide,.ticket .note{grid-column:1/-1}.ticket .note{font-size:13px;color:#6b6252;line-height:1.35}
+  .ticket .stamp{position:absolute;right:16px;top:14px;transform:rotate(-12deg);border:3px solid #fff;color:#fff;font-weight:900;font-size:15px;padding:4px 10px;border-radius:6px;opacity:.9}
+  .msg{font-size:18px;line-height:1.5;background:rgba(255,255,255,.07);border-left:4px solid var(--ball);padding:14px 16px;border-radius:0 12px 12px 0;white-space:pre-line}
+  .countdown{font-size:140px;font-weight:900;text-align:center;line-height:1;letter-spacing:-.06em}
+  #confetti{position:fixed;inset:0;z-index:5;pointer-events:none}
+  .setwon{position:fixed;inset:0;z-index:4;display:none;place-items:center;background:rgba(15,36,64,.94);text-align:center;padding:24px}
+  .setwon.show{display:grid}.setwon h2{font-size:44px}
+  .mute{position:fixed;top:12px;right:12px;z-index:6;width:44px;height:44px;border-radius:50%;border:2px solid var(--sand);background:rgba(15,36,64,.85);color:var(--sand);font-size:20px;display:grid;place-items:center;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="court" aria-hidden="true"><svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice">
+  <rect width="400" height="800" fill="#0f2440"/><rect x="-40" y="120" width="480" height="640" fill="#1f63b5"/>
+  <g stroke="#fff" stroke-width="4" fill="none" opacity=".9"><rect x="-40" y="120" width="480" height="640"/><line x1="-40" y1="440" x2="440" y2="440" stroke-width="6"/><line x1="-40" y1="300" x2="440" y2="300"/><line x1="-40" y1="580" x2="440" y2="580"/><line x1="200" y1="120" x2="200" y2="300"/><line x1="200" y1="580" x2="200" y2="760"/></g>
+  <rect width="400" height="800" fill="url(#fade)"/><defs><linearGradient id="fade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0f2440" stop-opacity=".55"/><stop offset=".5" stop-color="#0f2440" stop-opacity=".75"/><stop offset="1" stop-color="#0f2440" stop-opacity=".95"/></linearGradient></defs>
+</svg></div>
+
+<section class="screen active" id="s-intro">
+  <div class="fill"></div>
+  <div class="ball bounce" style="margin:0 auto 26px"></div>
+  <h1><small>Valencia, 2026</small>Torneo<br>Mabel<br>44</h1>
+  <p style="margin-top:18px">Partido al mejor de tres sets. Rivales: tus hijos, el circuito y tu marido. Gana los tres y te llevas el premio.</p>
+  <div class="fill"></div>
+  <button class="btn" onclick="AUDIO.init();AUDIO.sfx.bounce();go('s-set1')">Saltar a la pista</button>
+</section>
+
+<section class="screen" id="s-set1">
+  <div class="board" id="board1"></div><div style="height:22px"></div>
+  <h2>Set 1<br>contra tus hijos</h2>
+  <p class="muted" id="hint1">Tres puntos, uno por cada uno. Falla y repites.</p>
+  <div id="quiz1"></div><div class="feedback" id="fb1"></div>
+  <div id="vidbox1"></div>
+  <div class="fill"></div>
+  <button class="btn" id="next1" disabled onclick="nextPoint(1)">Siguiente punto</button>
+</section>
+
+<section class="screen" id="s-set2">
+  <div class="board" id="board2"></div><div style="height:22px"></div>
+  <h2>Set 2<br>contra el circuito</h2>
+  <p class="muted">Aquí no hay respuesta mala. Casi.</p>
+  <div id="quiz2"></div><div class="feedback" id="fb2"></div>
+  <div class="fill"></div>
+  <button class="btn" id="next2" disabled onclick="nextPoint(2)">Siguiente punto</button>
+</section>
+
+<section class="screen" id="s-set3">
+  <div class="board" id="board3"></div><div style="height:22px"></div>
+  <h2>Set 3<br>contra tu marido</h2>
+  <p class="muted">Este se gana rascando. Con el dedo, como la arena de la pista.</p>
+  <div class="scratch" id="scratch"><div class="under" id="under3"></div><canvas id="scratchCanvas"></canvas></div>
+  <div class="fill"></div>
+  <button class="btn" id="btn3" disabled onclick="winSet(3,'s-count')">Match point</button>
+</section>
+
+<section class="screen" id="s-count"><div class="fill"></div><div class="countdown" id="cd">3</div><div class="fill"></div></section>
+
+<section class="screen" id="s-ticket">
+  <div class="board" id="board4"></div><div style="height:22px"></div>
+  <h2>Juego, set y partido.</h2>
+  <p>Has ganado el torneo. Y el premio es este:</p>
+  <div class="ticket">
+    <div class="top"><div class="ev">Valencia Premier Padel P1</div><div class="tt">Entrada para Mabel</div><div class="stamp">Pagado</div></div>
+    <div class="tear"></div>
+    <div class="body">
+      <div><div class="k">Dónde</div><div class="v">La Fonteta, Valencia</div></div>
+      <div><div class="k">Cuándo</div><div class="v">Junio 2027</div></div>
+      <div class="wide"><div class="k">Acompañante</div><div class="v">Quien tú elijas</div></div>
+      <div class="note">Fecha exacta por confirmar por la organización. Entrada válida en cuanto salgan a la venta. No caduca, no se cambia por nada y no admite excusas.</div>
+    </div>
+  </div>
+  <div style="height:16px"></div>
+  <div class="msg" id="msgFinal"></div>
+  <div class="fill" style="min-height:16px"></div>
+  <button class="btn" onclick="AUDIO.sfx.fanfare();fireConfetti()">Más confeti</button>
+</section>
+
+<div class="setwon" id="setwon"><div><div class="ball" style="margin:0 auto 18px"></div><h2 id="setwonTxt"></h2><p class="muted">Cambio de lado.</p></div></div>
+<button class="mute" id="mute" aria-label="Silenciar" onclick="AUDIO.toggle()">🔊</button>
+<canvas id="confetti"></canvas>
+
+<script>
+/* ============================================================
+   CONFIGURACIÓN — edita solo esto
+   ============================================================ */
+const CONFIG = {
+  // SET 1: preguntas sobre los hijos. "ok" = índice de la correcta. "video" se reproduce al acertar.
+  set1: [
+    { q: "¿Quién es tu hija más dulce y bailarina?",
+      opts: ["Mabelita", "José", "Hugo"], ok: 0, video: "mabelita.mp4" },
+    { q: "¿Quién es tu hijo más detallista y molestica?",
+      opts: ["Mabelita", "José", "Hugo"], ok: 1, video: "jose.mp4" },
+    { q: "¿Quién es el adolescente más amable y menos egoísta?",
+      opts: ["Mabelita", "José", "Hugo"], ok: 2, video: "hugo.mp4" },
+  ],
+  // SET 2: pádel. Si "ok" es null, cualquier respuesta vale y se muestra el comentario de esa opción.
+  set2: [
+    { q: "¿Cuál es tu golpe favorito?",
+      opts: ["La bandeja", "La víbora", "El remate por 3", "El globo", "La chiquita"], ok: null,
+      comments: ["Clásico. Segura y elegante.", "Con mala leche. Nos gusta.", "Espectáculo puro.", "Paciencia y cabeza. Muy tú.", "La que desespera al rival."] },
+    { q: "¿Tu jugadora favorita del circuito?",
+      opts: ["Ari Sánchez", "Paula Josemaría", "Gemma Triay", "Delfi Brea", "Bea González"], ok: null,
+      comments: ["La campeona de Valencia 2026.", "Potencia y punch.", "Veteranía y clase.", "La argentina imparable.", "Talento joven."] },
+  ],
+  // SET 3: texto que aparece bajo el rasca (mensaje tuyo). PLACEHOLDER.
+  mensajeSet3: "Este set lo juego yo. Y lo pierdo a propósito, como todos los años.\nFeliz cumpleaños.",
+  // Mensaje final debajo del ticket. PLACEHOLDER.
+  mensajeFinal: "Feliz 44, Mabel. Este año te veo en La Fonteta gritando bandejas desde la grada. Te quiero.",
+};
+/* ============================================================ */
+
+
+/* ---------- AUDIO (todo sintetizado, sin ficheros) ---------- */
+const AUDIO=(()=>{
+  let ctx,master,musicGain,loopTimer,step=0,muted=false,started=false,paused=false;
+  const BPM=124, STEP=60/BPM/2; // corcheas
+  // Am – F – C – G, línea de bajo + arpegio + hi-hat
+  const bass=[57,57,57,57,53,53,53,53,48,48,48,48,55,55,55,55];
+  const arp=[[69,72,76],[65,69,72],[60,64,67],[67,71,74]];
+  const f=n=>440*Math.pow(2,(n-69)/12);
+  function init(){
+    if(started) return; started=true;
+    ctx=new (window.AudioContext||window.webkitAudioContext)();
+    master=ctx.createGain(); master.gain.value=muted?0:1; master.connect(ctx.destination);
+    musicGain=ctx.createGain(); musicGain.gain.value=.22; musicGain.connect(master);
+    startLoop();
+  }
+  function tone(freq,type,t,dur,vol,dest){
+    const o=ctx.createOscillator(), g=ctx.createGain(); o.type=type; o.frequency.setValueAtTime(freq,t);
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(vol,t+.01); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    o.connect(g); g.connect(dest||master); o.start(t); o.stop(t+dur+.05);
+  }
+  function noise(t,dur,vol,dest,hp){
+    const b=ctx.createBuffer(1,ctx.sampleRate*dur,ctx.sampleRate), d=b.getChannelData(0);
+    for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+    const src=ctx.createBufferSource(); src.buffer=b;
+    const fl=ctx.createBiquadFilter(); fl.type=hp?'highpass':'lowpass'; fl.frequency.value=hp||1200;
+    const g=ctx.createGain(); g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    src.connect(fl); fl.connect(g); g.connect(dest||master); src.start(t);
+  }
+  function startLoop(){
+    stopLoop(); let next=ctx.currentTime+.05;
+    loopTimer=setInterval(()=>{
+      while(next<ctx.currentTime+.25){
+        const i=step%16, bar=Math.floor(step/4)%4;
+        if(i%2===0) tone(f(bass[i]-12),'sawtooth',next,STEP*1.6,.5,musicGain);           // bajo
+        tone(f(arp[Math.floor(i/4)][i%3]+12),'square',next,STEP*.6,.12,musicGain);        // arpegio
+        if(i%4===0) noise(next,.08,.35,musicGain);                                          // bombo-ish
+        if(i%4===2) noise(next,.05,.18,musicGain,6000);                                     // hi-hat
+        if(i%8===4) noise(next,.12,.25,musicGain,2500);                                     // caja
+        next+=STEP; step++;
+      }
+    },60);
+  }
+  function stopLoop(){ clearInterval(loopTimer); }
+  function duck(on){ if(!ctx) return; musicGain.gain.cancelScheduledValues(ctx.currentTime); musicGain.gain.linearRampToValueAtTime(on?.03:.22,ctx.currentTime+.4); }
+  const sfx={
+    pop(){ if(!ctx) return; const t=ctx.currentTime; tone(880,'sine',t,.12,.5); tone(1320,'sine',t+.08,.18,.4); },
+    bounce(){ if(!ctx) return; const t=ctx.currentTime; tone(220,'sine',t,.12,.6); noise(t,.05,.3,null,800); },
+    buzz(){ if(!ctx) return; const t=ctx.currentTime; tone(140,'sawtooth',t,.25,.35); tone(120,'sawtooth',t+.05,.25,.3); },
+    set(){ if(!ctx) return; const t=ctx.currentTime; [523,659,784,1047].forEach((q,i)=>tone(q,'triangle',t+i*.09,.35,.5)); },
+    tick(){ if(!ctx) return; tone(660,'square',ctx.currentTime,.08,.4); },
+    fanfare(){ if(!ctx) return; const t=ctx.currentTime;
+      [[523,0],[523,.15],[523,.3],[659,.45],[784,.75],[1047,1.05]].forEach(([q,d])=>{tone(q,'sawtooth',t+d,.35,.45);tone(q/2,'triangle',t+d,.4,.3);});
+      noise(t+.9,2.8,.5,null,400); noise(t+1.4,2.2,.4,null,300); // ovación
+    },
+    scratch(){ if(!ctx) return; noise(ctx.currentTime,.06,.12,null,3000); }
+  };
+  function toggle(){ muted=!muted; if(master) master.gain.value=muted?0:1; document.getElementById('mute').textContent=muted?'🔇':'🔊'; }
+  return {init,duck,sfx,toggle};
+})();
+
+const sets=[false,false,false]; const idx={1:0,2:0};
+function board(el){
+  const b=document.getElementById(el), live=sets.indexOf(false);
+  b.innerHTML=`<div class="hdr"></div><div class="hdr">S1</div><div class="hdr">S2</div><div class="hdr">S3</div>
+   <div class="name">Mabel</div>${[0,1,2].map(i=>`<div class="cell ${sets[i]?'won':(i===live?'live':'')}">${sets[i]?'1':'·'}</div>`).join('')}
+   <div class="name">Resto</div>${[0,1,2].map(i=>`<div class="cell">${sets[i]?'0':'·'}</div>`).join('')}`;
+}
+function go(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active'); window.scrollTo(0,0);
+  ['board1','board2','board3','board4'].forEach(board);
+  if(id==='s-set1') renderQ(1); if(id==='s-set2') renderQ(2);
+  if(id==='s-set3') initScratch(); if(id==='s-count') runCountdown();
+  if(id==='s-ticket'){document.getElementById('msgFinal').textContent=CONFIG.mensajeFinal; AUDIO.sfx.fanfare(); fireConfetti();}
+}
+function winSet(n,next){
+  sets[n-1]=true; const sw=document.getElementById('setwon');
+  document.getElementById('setwonTxt').textContent=`Set ${n} para Mabel`; AUDIO.sfx.set(); sw.classList.add('show');
+  setTimeout(()=>{sw.classList.remove('show');go(next);},1500);
+}
+
+/* quiz genérico */
+function renderQ(s){
+  const list=CONFIG['set'+s], i=idx[s], box=document.getElementById('quiz'+s), fb=document.getElementById('fb'+s);
+  const vb=document.getElementById('vidbox'+s); if(vb) vb.innerHTML='';
+  document.getElementById('next'+s).disabled=true; fb.textContent='';
+  const p=list[i];
+  box.innerHTML=`<p class="q">Punto ${i+1} de ${list.length}: ${p.q}</p>`+p.opts.map((o,k)=>`<button class="opt" onclick="answer(${s},${k},this)">${o}</button>`).join('');
+}
+function answer(s,k,el){
+  const p=CONFIG['set'+s][idx[s]], fb=document.getElementById('fb'+s);
+  if(p.ok===null || k===p.ok){
+    document.querySelectorAll('#quiz'+s+' .opt').forEach(b=>b.disabled=true); el.classList.add('ok');
+    fb.textContent = p.ok===null ? (p.comments?.[k]||'Punto para Mabel.') : 'Punto para Mabel.';
+    AUDIO.sfx.pop(); if(p.video){ playVideo(s,p.video); } else document.getElementById('next'+s).disabled=false;
+  } else { AUDIO.sfx.buzz(); el.classList.add('bad'); fb.textContent='Fuera. Repite el punto.'; }
+}
+function resolveSrc(src){
+  if(typeof VIDEOS!=='undefined' && VIDEOS[src]){
+    if(!VIDEOS._urls) VIDEOS._urls={};
+    if(!VIDEOS._urls[src]){
+      const bin=atob(VIDEOS[src]); const arr=new Uint8Array(bin.length);
+      for(let i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
+      VIDEOS._urls[src]=URL.createObjectURL(new Blob([arr],{type:'video/mp4'}));
+    }
+    return VIDEOS._urls[src];
+  }
+  return src;
+}
+function playVideo(s,src){
+  const vb=document.getElementById('vidbox'+s), btn=document.getElementById('next'+s);
+  vb.innerHTML=`<div class="video-wrap"><video playsinline controls preload="auto"></video></div><p class="muted" id="verr${s}" style="display:none;font-size:14px">El vídeo no ha cargado. Toca el play o pasa al siguiente punto.</p>`;
+  const v=vb.querySelector('video');
+  try{ v.src=resolveSrc(src); }catch(e){ document.getElementById('verr'+s).style.display='block'; btn.disabled=false; return; }
+  AUDIO.duck(true);
+  v.addEventListener('ended',()=>{AUDIO.duck(false);btn.disabled=false;},{once:true});
+  v.addEventListener('error',()=>{document.getElementById('verr'+s).style.display='block';AUDIO.duck(false);btn.disabled=false;},{once:true});
+  v.play().catch(()=>{});
+  vb.scrollIntoView({behavior:'smooth',block:'center'});
+  setTimeout(()=>btn.disabled=false,10000);
+}
+function nextPoint(s){
+  idx[s]++;
+  if(idx[s]<CONFIG['set'+s].length) renderQ(s);
+  else winSet(s, s===1?'s-set2':'s-set3');
+}
+
+/* rasca */
+let scratchReady=false;
+function initScratch(){
+  if(scratchReady) return; scratchReady=true;
+  document.getElementById('under3').textContent=CONFIG.mensajeSet3;
+  const box=document.getElementById('scratch'), c=document.getElementById('scratchCanvas'), ctx=c.getContext('2d');
+  const r=box.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
+  c.width=r.width*dpr; c.height=r.height*dpr; ctx.scale(dpr,dpr);
+  ctx.fillStyle='#dce84a'; ctx.fillRect(0,0,r.width,r.height);
+  ctx.fillStyle='#0b1a2e'; ctx.textAlign='center';
+  ctx.font='800 24px Helvetica Neue, Arial, sans-serif'; ctx.fillText('Rasca aquí', r.width/2, r.height/2+8);
+  ctx.globalCompositeOperation='destination-out';
+  let drawing=false;
+  const pos=e=>[e.clientX-r.left,e.clientY-r.top];
+  const paint=e=>{ if(!drawing) return; e.preventDefault(); if(Math.random()<.3) AUDIO.sfx.scratch(); const [x,y]=pos(e); ctx.beginPath(); ctx.arc(x,y,26,0,Math.PI*2); ctx.fill(); check(); };
+  function check(){
+    const d=ctx.getImageData(0,0,c.width,c.height).data; let n=0,t=0;
+    for(let i=3;i<d.length;i+=64){t++; if(d[i]===0) n++;}
+    if(n/t>0.5){ c.style.transition='opacity .5s'; c.style.opacity=0; setTimeout(()=>c.remove(),500); document.getElementById('btn3').disabled=false; }
+  }
+  c.addEventListener('pointerdown',e=>{drawing=true;paint(e)});
+  c.addEventListener('pointermove',paint);
+  window.addEventListener('pointerup',()=>drawing=false);
+}
+
+function runCountdown(){
+  const el=document.getElementById('cd'); let n=3; el.textContent=n;
+  AUDIO.sfx.tick(); const t=setInterval(()=>{n--; if(n===0){clearInterval(t);go('s-ticket');} else {el.textContent=n; AUDIO.sfx.tick();}},800);
+}
+const cc=document.getElementById('confetti'), cx=cc.getContext('2d'); let parts=[],raf;
+function fireConfetti(){
+  cc.width=innerWidth; cc.height=innerHeight; const colors=['#dce84a','#fff','#1f63b5','#f6efe2'];
+  for(let i=0;i<180;i++) parts.push({x:Math.random()*cc.width,y:-20-Math.random()*cc.height*.5,w:6+Math.random()*6,h:10+Math.random()*8,vx:(Math.random()-.5)*2,vy:2+Math.random()*3,rot:Math.random()*6,vr:(Math.random()-.5)*.2,c:colors[i%4]});
+  cancelAnimationFrame(raf); tick();
+}
+function tick(){
+  cx.clearRect(0,0,cc.width,cc.height);
+  parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.rot+=p.vr;cx.save();cx.translate(p.x,p.y);cx.rotate(p.rot);cx.fillStyle=p.c;cx.fillRect(-p.w/2,-p.h/2,p.w,p.h);cx.restore();});
+  parts=parts.filter(p=>p.y<cc.height+30); if(parts.length) raf=requestAnimationFrame(tick);
+}
+</script>
+</body>
+</html>
